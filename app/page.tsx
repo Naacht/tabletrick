@@ -7,6 +7,7 @@ import { useTableStore } from '@/store/useTableStore';
 import { TableGrid } from '@/components/dashboard/TableGrid';
 import { ChefHat, Home } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { History } from 'lucide-react';
 
 export default function HomePage() {
   const { tables } = useTableStore();
@@ -28,6 +29,12 @@ export default function HomePage() {
                 Restaurant Commande
               </h1>
             </div>
+            <Link href="/historique">
+            <Button variant="outline" className="flex items-center gap-2">
+              <History className="w-5 h-5" />
+              Historique
+            </Button>
+          </Link>
             <Link href="/cuisine">
               <Button variant="primary" className="flex items-center gap-2">
                 <ChefHat className="w-5 h-5" />

@@ -139,15 +139,9 @@ export const MENU_ITEMS: MenuItem[] = [
     category: 'cafe',
     price: 5.00,
   },
-  {
-    id: 'cf5',
-    name: 'Flat white',
-    category: 'cafe',
-    price: 4.00,
-  },
-  {
+    {
     id: 'cf6',
-    name: 'Cappuccino',
+    name: 'Cortado',
     category: 'cafe',
     price: 4.00,
   },
@@ -155,19 +149,25 @@ export const MENU_ITEMS: MenuItem[] = [
     id: 'cf7',
     name: 'Flat white',
     category: 'cafe',
-    price: 4.00,
+    price: 5.00,
   },
   {
     id: 'cf8',
+    name: 'Cappuccino',
+    category: 'cafe',
+    price: 4.80,
+  },
+  {
+    id: 'cf9',
     name: 'Macchiato latte',
     category: 'cafe',
     price: 5.00,
   },
   {
-    id: 'cf9',
+    id: 'cf10',
     name: 'Latte',
     category: 'cafe',
-    price: 4.50,
+    price: 5.50,
   },
 
   // === MATCHA ===
@@ -185,27 +185,27 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'm3',
-    name: 'Iced matcha strawberry',
+    name: 'Iced matcha Strawberry',
     category: 'matcha',
     price: 6.50,
   },
   {
     id: 'm4',
-    name: 'Iced matcha lemon',
+    name: 'Iced matcha Mango',
     category: 'matcha',
     price: 7.00,
   },
   {
     id: 'm5',
-    name: 'Iced matcha raspberry',
+    name: 'Iced matcha Raspberry',
     category: 'matcha',
     price: 7.00,
   },
   {
     id: 'm6',
-    name: 'Matcha ceremonial',
+    name: 'Matcha Ceremonial',
     category: 'matcha',
-    price: 5.00,
+    price: 8.00,
   },
 
   // === COMFORT DRINKS ===
@@ -229,7 +229,7 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'cd4',
-    name: 'Iced chai',
+    name: 'Mocaccino',
     category: 'comfort',
     price: 6.00,
   },
@@ -249,11 +249,11 @@ export const MENU_ITEMS: MenuItem[] = [
     id: 'cd7',
     name: 'Hojicha latte',
     category: 'comfort',
-    price: 6.50,
+    price: 5.50,
   },
   {
     id: 'cd8',
-    name: 'Golden latte',
+    name: 'Thé',
     category: 'comfort',
     price: 5.50,
   },
@@ -274,26 +274,6 @@ export const MENU_ITEMS: MenuItem[] = [
     description: 'Pomme, concombre, kiwi, citron vert, gingembre',
   },
 
-  // === SUPPLÉMENTS ===
-  {
-    id: 's1',
-    name: 'Lait végétal',
-    category: 'supplements',
-    price: 0.50,
-    description: 'Avoine, amande, coco',
-  },
-  {
-    id: 's2',
-    name: 'Iced',
-    category: 'supplements',
-    price: 0.50,
-  },
-  {
-    id: 's3',
-    name: 'Extra shot',
-    category: 'supplements',
-    price: 1.00,
-  },
 ];
 
 export const CATEGORIES = [
@@ -303,5 +283,4 @@ export const CATEGORIES = [
   { id: 'matcha', label: 'Matcha', icon: '🍵' },
   { id: 'comfort', label: 'Comfort Drinks', icon: '🫖' },
   { id: 'jus', label: 'Jus Frais', icon: '🍊' },
-  { id: 'supplements', label: 'Suppléments', icon: '➕' },
 ] as const;

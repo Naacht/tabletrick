@@ -1,11 +1,10 @@
-// src/app/table/[id]/page.tsx - Modifier la partie principale
-
+// app/table/[id]/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, UtensilsCrossed, History } from 'lucide-react';
+import { ArrowLeft, UtensilsCrossed, History, LogOut } from 'lucide-react';
 import { useTableStore } from '@/store/useTableStore';
 import { useOrderStore } from '@/store/useOrderStore';
 import { MENU_ITEMS } from '@/constants/menu';
@@ -22,19 +21,19 @@ export default function TableOrderPage() {
   const params = useParams();
   const router = useRouter();
   const tableId = params.id as string;
-
+  
   const { getTableById, updateTableStatus } = useTableStore();
-  const {
-    currentOrder,
-    addItemToCurrentOrder,
-    removeItemFromCurrentOrder,
-    updateItemQuantity,
-    clearCurrentOrder,
-    getCurrentOrderTotal,
-    addOrder,
+  const { 
+    currentOrder, 
+    addItemToCurrentOrder, 
+    removeItemFromCurrentOrder, 
+    updateItemQuantity, 
+    clearCurrentOrder, 
+    getCurrentOrderTotal, 
+    addOrder, 
     getTableOrderHistory,
   } = useOrderStore();
-
+  
   const [selectedCategory, setSelectedCategory] = useState('brunch');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -43,6 +42,10 @@ export default function TableOrderPage() {
 
   const table = getTableById(tableId);
   const orderHistory = getTableOrderHistory(tableId);
+  
+  // Séparer les commandes servies des commandes actives
+  const servedOrders = orderHistory.filter(order => order.status === 'served');
+  const activeOrders = orderHistory.filter(order => order.status !== 'served');
 
   useEffect(() => {
     if (!table) {
@@ -103,10 +106,8 @@ export default function TableOrderPage() {
     }
 
     setIsSubmitting(true);
-
     try {
       const total = getCurrentOrderTotal();
-
       const order = addOrder({
         tableId,
         items: currentOrder,
@@ -122,9 +123,9 @@ export default function TableOrderPage() {
 
       updateTableStatus(tableId, 'occupied', order.id);
       clearCurrentOrder();
-
+      
       toast.success('Commande envoyée en cuisine !');
-
+      
       setTimeout(() => {
         router.push('/');
       }, 1500);
@@ -134,6 +135,26 @@ export default function TableOrderPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleReleaseTable = () => {
+    if (activeOrders.length > 0) {
+      toast.error('Impossible de libérer : des commandes sont encore actives');
+      return;
+    }
+
+    if (servedOrders.length === 0) {
+      toast.error('Aucune commande à finaliser');
+      return;
+    }
+
+    // Libérer la table
+    updateTableStatus(tableId, 'available');
+    toast.success(`Table ${table.number} libérée`);
+    
+    setTimeout(() => {
+      router.push('/');
+    }, 1000);
   };
 
   return (
@@ -161,18 +182,32 @@ export default function TableOrderPage() {
                 </div>
               </div>
             </div>
-            
-            {/* Bouton Historique */}
-            {orderHistory.length > 0 && (
-              <Button
-                variant="outline"
-                onClick={() => setShowHistory(!showHistory)}
-                className="flex items-center gap-2"
-              >
-                <History className="w-5 h-5" />
-                Historique ({orderHistory.length})
-              </Button>
-            )}
+
+            <div className="flex items-center gap-2">
+              {/* Bouton Historique */}
+              {orderHistory.length > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="flex items-center gap-2"
+                >
+                  <History className="w-5 h-5" />
+                  Historique ({orderHistory.length})
+                </Button>
+              )}
+
+              {/* Bouton Libérer la table */}
+              {servedOrders.length > 0 && activeOrders.length === 0 && (
+                <Button
+                  variant="success"
+                  onClick={handleReleaseTable}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Libérer la table
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -190,15 +225,22 @@ export default function TableOrderPage() {
           {/* Menu */}
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Menu</h2>
+            
             <MenuCategories
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}
             />
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {filteredMenuItems.map((item) => (
-                <MenuItemCard key={item.id} item={item} onAdd={handleAddItem} />
+                <MenuItemCard
+                  key={item.id}
+                  item={item}
+                  onAdd={handleAddItem}
+                />
               ))}
             </div>
+
             {filteredMenuItems.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500">
