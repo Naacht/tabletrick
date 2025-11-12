@@ -70,6 +70,10 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       (order) => order.tableId === tableId && order.status !== 'served'
     );
   },
+
+  getTableOrderHistory: (tableId) => {
+    return get().orders.filter((order) => order.tableId === tableId);
+  },
   
   // Gestion de la commande en cours
   addItemToCurrentOrder: (item) =>

@@ -1,16 +1,19 @@
-// src/app/table/[id]/page.tsx
+// src/app/table/[id]/page.tsx - Modifier la partie principale
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, UtensilsCrossed } from 'lucide-react';
+import { ArrowLeft, UtensilsCrossed, History } from 'lucide-react';
 import { useTableStore } from '@/store/useTableStore';
 import { useOrderStore } from '@/store/useOrderStore';
 import { MENU_ITEMS } from '@/constants/menu';
 import { MenuCategories } from '@/components/order/MenuCategories';
 import { MenuItemCard } from '@/components/order/MenuItemCard';
 import { OrderSummary } from '@/components/order/OrderSummary';
+import { ItemCustomizationModal } from '@/components/order/ItemCustomizationModal';
+import { OrderHistory } from '@/components/order/OrderHistory';
 import { Button } from '@/components/ui/Button';
 import { MenuItem } from '@/types';
 import toast from 'react-hot-toast';
@@ -19,7 +22,7 @@ export default function TableOrderPage() {
   const params = useParams();
   const router = useRouter();
   const tableId = params.id as string;
-  
+
   const { getTableById, updateTableStatus } = useTableStore();
   const {
     currentOrder,
@@ -29,82 +32,110 @@ export default function TableOrderPage() {
     clearCurrentOrder,
     getCurrentOrderTotal,
     addOrder,
+    getTableOrderHistory,
   } = useOrderStore();
-  
+
   const [selectedCategory, setSelectedCategory] = useState('brunch');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
   const table = getTableById(tableId);
-  
+  const orderHistory = getTableOrderHistory(tableId);
+
   useEffect(() => {
     if (!table) {
       toast.error('Table introuvable');
       router.push('/');
     }
   }, [table, router]);
-  
+
   if (!table) {
     return null;
   }
-  
+
   const filteredMenuItems = MENU_ITEMS.filter(
     (item) => item.category === selectedCategory
   );
-  
+
   const handleAddItem = (menuItem: MenuItem) => {
-    addItemToCurrentOrder({
-      menuItem,
-      quantity: 1,
-    });
-    toast.success(`${menuItem.name} ajouté`);
+    setSelectedItem(menuItem);
+    setIsModalOpen(true);
   };
-  
+
+  const handleConfirmCustomization = (customization: {
+    removedIngredients: string[];
+    supplements: string[];
+    notes: string;
+    quantity: number;
+  }) => {
+    if (!selectedItem) return;
+
+    let fullNotes = '';
+    if (customization.removedIngredients.length > 0) {
+      fullNotes += `SANS: ${customization.removedIngredients.join(', ')}`;
+    }
+    if (customization.supplements.length > 0) {
+      if (fullNotes) fullNotes += ' | ';
+      fullNotes += `AVEC: ${customization.supplements.join(', ')}`;
+    }
+    if (customization.notes) {
+      if (fullNotes) fullNotes += ' | ';
+      fullNotes += customization.notes;
+    }
+
+    addItemToCurrentOrder({
+      menuItem: selectedItem,
+      quantity: customization.quantity,
+      notes: fullNotes || undefined,
+      removedIngredients: customization.removedIngredients,
+      supplements: customization.supplements,
+    });
+
+    toast.success(`${selectedItem.name} ajouté (x${customization.quantity})`);
+  };
+
   const handleSubmitOrder = async () => {
     if (currentOrder.length === 0) {
       toast.error('Ajoutez des articles avant de soumettre');
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const total = getCurrentOrderTotal();
-      
-      // Créer la commande
+
       const order = addOrder({
         tableId,
         items: currentOrder,
         status: 'pending',
         totalAmount: total,
       });
-      
-      // Envoyer à l'API
+
       await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(order),
       });
-      
-      // Mettre à jour le statut de la table
+
       updateTableStatus(tableId, 'occupied', order.id);
-      
-      // Nettoyer le panier
       clearCurrentOrder();
-      
+
       toast.success('Commande envoyée en cuisine !');
-      
-      // Rediriger vers le dashboard
+
       setTimeout(() => {
         router.push('/');
       }, 1500);
     } catch (error) {
-      toast.error('Erreur lors de l\'envoi de la commande');
+      toast.error("Erreur lors de l'envoi de la commande");
       console.error(error);
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -130,32 +161,44 @@ export default function TableOrderPage() {
                 </div>
               </div>
             </div>
+            
+            {/* Bouton Historique */}
+            {orderHistory.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={() => setShowHistory(!showHistory)}
+                className="flex items-center gap-2"
+              >
+                <History className="w-5 h-5" />
+                Historique ({orderHistory.length})
+              </Button>
+            )}
           </div>
         </div>
       </header>
-      
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Historique (affichage conditionnel) */}
+        {showHistory && (
+          <div className="mb-8">
+            <OrderHistory orders={orderHistory} />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Menu */}
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Menu</h2>
-            
             <MenuCategories
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}
             />
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {filteredMenuItems.map((item) => (
-                <MenuItemCard
-                  key={item.id}
-                  item={item}
-                  onAdd={handleAddItem}
-                />
+                <MenuItemCard key={item.id} item={item} onAdd={handleAddItem} />
               ))}
             </div>
-            
             {filteredMenuItems.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500">
@@ -164,7 +207,7 @@ export default function TableOrderPage() {
               </div>
             )}
           </div>
-          
+
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <OrderSummary
@@ -178,6 +221,17 @@ export default function TableOrderPage() {
           </div>
         </div>
       </main>
+
+      {/* Customization Modal */}
+      <ItemCustomizationModal
+        item={selectedItem!}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedItem(null);
+        }}
+        onConfirm={handleConfirmCustomization}
+      />
     </div>
   );
 }

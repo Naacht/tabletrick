@@ -16,6 +16,8 @@ export interface OrderItem {
   menuItem: MenuItem;
   quantity: number;
   notes?: string;
+  removedIngredients?: string[];
+  supplements?: string[]; 
 }
 
 export interface Order {
