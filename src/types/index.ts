@@ -1,8 +1,7 @@
 // src/types/index.ts
-
 export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'served';
-
 export type TableStatus = 'available' | 'occupied' | 'reserved';
+export type TableLocation = 'interior' | 'exterior';
 
 export interface MenuItem {
   id: string;
@@ -31,8 +30,9 @@ export interface Order {
 
 export interface Table {
   id: string;
-  number: number;
+  number: string; // Changé de number à string pour supporter "E0", "E1", etc.
   capacity: number;
   status: TableStatus;
+  location: TableLocation; // Nouveau champ
   currentOrderId?: string;
 }
