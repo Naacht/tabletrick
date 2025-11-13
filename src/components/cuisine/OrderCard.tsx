@@ -33,10 +33,12 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onUpdateStatus }) =
     if (!nextStatus) return null;
     
     const buttonConfig = {
+      pending: { label: 'En attente', icon: Clock, variant: 'outline' as const },
       preparing: { label: 'Commencer', icon: ChefHat, variant: 'primary' as const },
       ready: { label: 'Marquer prêt', icon: Check, variant: 'success' as const },
       served: { label: 'Marquer servi', icon: Check, variant: 'secondary' as const },
     };
+
     
     const config = buttonConfig[nextStatus];
     const Icon = config.icon;
