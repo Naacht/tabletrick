@@ -176,9 +176,6 @@ export default function TableOrderPage() {
                   <h1 className="text-2xl font-bold text-gray-900">
                     Table {table.number}
                   </h1>
-                  <p className="text-sm text-gray-600">
-                    Capacité: {table.capacity} personnes
-                  </p>
                 </div>
               </div>
             </div>

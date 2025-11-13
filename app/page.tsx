@@ -8,6 +8,7 @@ import { TableGrid } from '@/components/dashboard/TableGrid';
 import { ChefHat, Home } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { History } from 'lucide-react';
+import { storage } from '@/lib/storage';
 
 export default function HomePage() {
   const { tables } = useTableStore();
@@ -40,6 +41,18 @@ export default function HomePage() {
                 <ChefHat className="w-5 h-5" />
                 Interface Cuisine
               </Button>
+              
+              <button
+                onClick={() => {
+                  if (confirm('Voulez-vous vraiment réinitialiser toutes les données ?')) {
+                    storage.clearAll();
+                    window.location.reload();
+                  }
+                }}
+                className="text-sm text-red-600 hover:text-red-700"
+              >
+              </button>
+
             </Link>
           </div>
         </div>

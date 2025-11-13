@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./responsive.css";
+
 
 :root {
   --background: #ffffff;

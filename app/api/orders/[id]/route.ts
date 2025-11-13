@@ -9,10 +9,11 @@ let orders: Order[] = [];
 // GET /api/orders/[id] - Récupérer une commande par ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const order = orders.find((o) => o.id === params.id);
+    const { id } = context.params;
+    const order = orders.find((o) => o.id === id);
     
     if (!order) {
       return NextResponse.json(

@@ -1,21 +1,29 @@
 // src/app/layout.tsx
-import type { Metadata } from 'next';
+'use client';
+
+import { useEffect } from 'react';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import { useOrderStore } from '@/store/useOrderStore';
+import { useTableStore } from '@/store/useTableStore';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'Restaurant Commande',
-  description: 'Système de gestion de commandes pour restaurant',
-};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const hydrateOrders = useOrderStore((state) => state.hydrate);
+  const hydrateTables = useTableStore((state) => state.hydrate);
+  
+  // Charger les données au démarrage
+  useEffect(() => {
+    hydrateOrders();
+    hydrateTables();
+  }, [hydrateOrders, hydrateTables]);
+  
   return (
     <html lang="fr">
       <body className={inter.className}>
