@@ -91,9 +91,9 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
         <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
         
-        <div className="relative bg-white rounded-t-3xl sm:rounded-xl shadow-2xl w-full sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="relative bg-white rounded-t-3xl sm:rounded-xl w-full sm:max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 border-b sticky top-0 bg-white z-10">
             <div>
               <h2 className="text-xl font-bold text-gray-900">{item.name}</h2>
               <p className="text-sm text-gray-600">{formatPrice(item.price)}</p>
