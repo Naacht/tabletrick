@@ -34,11 +34,12 @@ export async function GET(
 // PUT /api/orders/[id] - Mettre à jour une commande
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
     const body = await request.json();
-    const orderIndex = orders.findIndex((o) => o.id === params.id);
+    const orderIndex = orders.findIndex((o) => o.id === id);
     
     if (orderIndex === -1) {
       return NextResponse.json(
@@ -65,10 +66,11 @@ export async function PUT(
 // DELETE /api/orders/[id] - Supprimer une commande
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
-    const orderIndex = orders.findIndex((o) => o.id === params.id);
+    const orderIndex = orders.findIndex((o) => o.id === id);
     
     if (orderIndex === -1) {
       return NextResponse.json(
